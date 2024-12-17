@@ -1,0 +1,7 @@
+{
+  "classes": {
+    "item": "text-black text-xl w-full",
+    "link": "text-black text-xl w-full block",
+    "header": "text-black text-2xl"
+  }
+}
