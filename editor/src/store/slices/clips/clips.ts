@@ -14,15 +14,18 @@ const name = "clips";
 
 const getClips = (state: ClipsSliceData) => state.clips;
 
+const languageTests = [
+  { language: "json", test: (value) => value.startsWith('[') },
+  { language: "yaml", test: (value) => value.startsWith('-') },
+];
+
 const checkLanguage = (value: string = "") => {
   const trimmedValue = value.trimStart();
-  if (trimmedValue.startsWith('[')) {
-    return "json";
-  }
-  if (trimmedValue.startsWith('-')) {
-    return "yaml";
-  }
-  return "text";
+  const { language = "text" } = languageTests.find(
+    ({test}) => test(trimmedValue)
+  ) || {};
+
+  return language;
 }
 
 const getCurrentValue = (state: ClipsSliceData): string => {
