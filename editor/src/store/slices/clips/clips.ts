@@ -41,6 +41,9 @@ export const clipsSlice = createSlice({
     },
   },
   selectors: {
+    getCurrentKey(state) {
+      return state.current;
+    },
     getKeys: createSelector(
       getClips,
       (clips) => Object.keys(clips)
