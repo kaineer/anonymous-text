@@ -21,9 +21,8 @@ const languageTests = [
 
 const checkLanguage = (value: string = "") => {
   const trimmedValue = value.trimStart();
-  const { language = "text" } = languageTests.find(
-    ({test}) => test(trimmedValue)
-  ) || {};
+  const { language = "text" } =
+    languageTests.find(({test}) => test(trimmedValue)) || {};
 
   return language;
 }
