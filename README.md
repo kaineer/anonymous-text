@@ -26,9 +26,9 @@ blue
 
 * Choice, yaml with weights
 ```yaml
-- text: green
+- text: green    # text: green, weight: 3
   weight: 3
-- "4:red"
-- blue
+- "4:red"        # text: red, weight: 4
+- blue           # text: blue, weight: 1
 ```
 All variants without weight have a 1 weight
