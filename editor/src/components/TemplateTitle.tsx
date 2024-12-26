@@ -7,7 +7,7 @@ export const TemplateTitle = () => {
   const currentKey = useSelector(getCurrentKey);
 
   return (
-    <div className="w-full bg-nord-6">
+    <div className="template-title">
       { currentKey }
     </div>
   );

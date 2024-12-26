@@ -1,25 +1,39 @@
 import { createSelector, createSlice } from "@reduxjs/toolkit";
+import { configureLocalStorage } from "../../../shared/utils/local-storage";
+
+type ClipsHash = {[key: string]: string};
+
+const reducerKey = "clips";
 
 interface ClipsSliceData {
-  clips: {[key: string]: string}; // key-value storage
-  current: string;                // current key
+  clips: ClipsHash;
+  current: string;
 }
 
-const initialState: ClipsSliceData = {
-  clips: {},
-  current: 'main'
-}
+const { load, store } =
+  configureLocalStorage<ClipsHash>(reducerKey, {});
 
-const name = "clips";
+const initialState = (): ClipsSliceData => {
+  const clips = load();
+
+  return {
+    clips,
+    current: "main"
+  };
+}
 
 const getClips = (state: ClipsSliceData) => state.clips;
 
 const languageTests = [
-  { language: "json", test: (value) => value.startsWith('[') },
-  { language: "yaml", test: (value) => value.startsWith('-') },
+  { language: "json", test: (value: string) => value.startsWith('[') },
+  { language: "yaml", test: (value: string) => value.startsWith('-') },
 ];
 
-const checkLanguage = (value: string = "") => {
+const getCurrentValue = (state: ClipsSliceData): string => {
+  return state.clips[state.current] || "";
+}
+
+const checkLanguage = (value: string = ""): string => {
   const trimmedValue = value.trimStart();
   const { language = "text" } =
     languageTests.find(({test}) => test(trimmedValue)) || {};
@@ -27,16 +41,23 @@ const checkLanguage = (value: string = "") => {
   return language;
 }
 
-const getCurrentValue = (state: ClipsSliceData): string => {
-  return state.clips[state.current] || "";
+const fetchTemplateKeys = (value: string): string[] => {
+  const keyRE = /\{\s*(\w+(\.\w+)*)\s*\}/g;
+  return [...value.matchAll(keyRE)].map((md) => md[1])
 }
 
 export const clipsSlice = createSlice({
-  name,
+  name: reducerKey,
   initialState,
   reducers: {
     setCurrentValue(state, action) {
       state.clips[state.current] = action.payload;
+      store(state.clips);
+    },
+    removeKey(state, action) {
+      const key = action.payload;
+      delete state.clips[key];
+      store(state.clips);
     },
     setCurrentKey(state, action) {
       state.current = action.payload;
@@ -46,17 +67,15 @@ export const clipsSlice = createSlice({
     getCurrentKey(state) {
       return state.current;
     },
+    getCurrentValue,
     getKeys: createSelector(
       getClips,
-      (clips) => Object.keys(clips)
+      Object.keys
     ),
     getCurrentKeys: createSelector(
       getCurrentValue,
-      (value) => [...value
-        .matchAll(/\{\s*(\w+(\.\w+)*)\s*\}/g)]
-        .map(([_, key]) => key)
+      fetchTemplateKeys
     ),
-    getCurrentValue,
     getLanguage: createSelector(
       getCurrentValue,
       checkLanguage

@@ -8,3 +8,7 @@ export const store = configureStore({
     [clipsSlice.reducerPath]: clipsSlice.reducer,
   }
 });
+
+store.subscribe(() => {
+  console.log("subscribe() " + Date.now());
+});
